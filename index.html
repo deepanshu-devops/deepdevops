@@ -632,28 +632,32 @@
     </div>
 
     <!-- ================= MODALS SECTION ================= -->
-    
-    <!-- 1. SECURE PAYMENT MODAL (NEW) -->
+<!-- 1. SECURE PAYMENT MODAL (RESPONSIVE) -->
     <div id="modal-payment" class="modal-overlay" onclick="closeModalOnOutsideClick(event)">
-        <div class="modal-content" style="max-width: 450px; text-align: center; overflow: hidden;">
-            <div class="modal-header" style="justify-content: center; position: relative; background: #1e293b; border-bottom: 1px solid var(--border-color);">
+        <!-- Changed: Added flexbox and max-height 90vh so it fits inside mobile screens -->
+        <div class="modal-content" style="max-width: 450px; text-align: center; display: flex; flex-direction: column; max-height: 90vh; overflow: hidden;">
+            
+            <!-- Header (Fixed at top, flex-shrink: 0 prevents it from squishing) -->
+            <div class="modal-header" style="justify-content: center; position: relative; background: #1e293b; border-bottom: 1px solid var(--border-color); flex-shrink: 0;">
                 <h3 style="font-size: 1.5rem; display: flex; align-items: center; gap: 8px;">
                     <i data-feather="lock" style="color: #22c55e;"></i> Secure Checkout
                 </h3>
                 <button class="modal-close" onclick="closeModal('modal-payment')" style="position: absolute; right: 20px; top: 24px;"><i data-feather="x"></i></button>
             </div>
-            <div class="modal-body" style="padding: 30px 20px; background: var(--bg-dark);">
+            
+            <!-- Body (Scrollable area) -->
+            <div class="modal-body" style="padding: 25px 20px; background: var(--bg-dark); overflow-y: auto; flex-grow: 1;">
                 
                 <h4 style="color: var(--cyan); margin-bottom: 5px; font-size: 1.1rem;" id="pay-course-name">Course Name</h4>
-                <div style="font-size: 2.5rem; font-weight: 800; color: var(--orange); margin-bottom: 25px;">₹<span id="pay-amount">0</span></div>
+                <div style="font-size: 2.2rem; font-weight: 800; color: var(--orange); margin-bottom: 20px;">₹<span id="pay-amount">0</span></div>
                 
-                <!-- QR CODE IMAGE (Ensure qr-code.jpg is in the same folder) -->
+                <!-- QR CODE IMAGE (Responsive sizing using max-height: 35vh) -->
                 <div style="background: white; padding: 15px; border-radius: 12px; display: inline-block; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
-                    <img src="qr-code.jpg" alt="PhonePe QR Code" style="width: 100%; max-width: 250px; display: block;">
+                    <img src="qr-code.jpg" alt="PhonePe QR Code" style="width: 100%; max-width: 250px; max-height: 35vh; object-fit: contain; display: block; margin: 0 auto;">
                 </div>
                 
                 <p style="font-weight: 800; font-size: 1.2rem; margin-bottom: 5px; letter-spacing: 1px;">DEEPANSHU KUSHWAHA</p>
-                <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 25px;">Scan using PhonePe, GPay, or Paytm</p>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px;">Scan using PhonePe, GPay, or Paytm</p>
                 
                 <!-- Instructions & WhatsApp Button -->
                 <div style="background: rgba(34, 197, 94, 0.1); border: 1px dashed rgba(34, 197, 94, 0.4); padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: left;">
@@ -663,7 +667,7 @@
                     </p>
                 </div>
                 
-                <a id="whatsapp-confirm-btn" href="#" target="_blank" class="btn btn-primary" style="width: 100%; background-color: #25D366; box-shadow: 0 0 15px rgba(37, 211, 102, 0.4);">
+                <a id="whatsapp-confirm-btn" href="#" target="_blank" class="btn btn-primary" style="width: 100%; background-color: #25D366; box-shadow: 0 0 15px rgba(37, 211, 102, 0.4); padding: 16px 10px;">
                     <i data-feather="message-circle"></i> Send Screenshot on WhatsApp
                 </a>
             </div>
