@@ -1,42 +1,866 @@
-<!-- 1. SECURE PAYMENT MODAL (NEW & RESPONSIVE) -->
-    <div id="modal-payment" class="modal-overlay" onclick="closeModalOnOutsideClick(event)">
-        <div class="modal-content" style="max-width: 450px; text-align: center; display: flex; flex-direction: column; max-height: 90vh;">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeepDevOps | Master Real-World DevOps</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Feather Icons -->
+    <script src="https://unpkg.com/feather-icons"></script>
+
+    <style>
+        /* --- CSS VARIABLES & RESET --- */
+        :root {
+            --bg-dark: #0B1120;
+            --bg-card: #1e293b;
+            --bg-card-hover: #334155;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --cyan: #06b6d4;
+            --cyan-glow: rgba(6, 182, 212, 0.4);
+            --orange: #f97316;
+            --orange-glow: rgba(249, 115, 22, 0.4);
+            --border-color: #334155;
+            --font-sans: 'Plus Jakarta Sans', sans-serif;
+            --font-mono: 'Fira Code', monospace;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: var(--font-sans);
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; }
+        
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+
+        /* --- TYPOGRAPHY --- */
+        h1, h2, h3, h4 { line-height: 1.2; font-weight: 800; }
+        .text-cyan { color: var(--cyan); }
+        .text-orange { color: var(--orange); }
+        .text-muted { color: var(--text-muted); }
+        
+        /* --- BUTTONS --- */
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center;
+            gap: 10px; padding: 14px 28px; border-radius: 8px;
+            font-weight: 700; font-size: 1rem; cursor: pointer;
+            transition: all 0.3s ease; border: none; text-align: center;
+        }
+        .btn-primary {
+            background-color: var(--orange); color: white;
+            box-shadow: 0 0 15px var(--orange-glow);
+        }
+        .btn-primary:hover {
+            background-color: #ea580c; transform: translateY(-2px);
+            box-shadow: 0 5px 20px var(--orange-glow);
+        }
+        .btn-secondary {
+            background-color: rgba(30, 41, 59, 0.8); color: white;
+            border: 1px solid var(--border-color);
+        }
+        .btn-secondary:hover { background-color: var(--bg-card-hover); }
+
+        /* --- NAVBAR --- */
+        header {
+            position: fixed; top: 0; width: 100%; height: 70px;
+            background: rgba(11, 17, 32, 0.85); backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color); z-index: 100;
+        }
+        .nav-container {
+            display: flex; justify-content: space-between; align-items: center;
+            height: 100%; max-width: 1200px; margin: 0 auto; padding: 0 20px;
+        }
+        .logo { 
+            display: flex; align-items: center; gap: 10px; font-size: 1.5rem; 
+            font-weight: 800; transition: transform 0.3s ease; 
+        }
+        .logo:hover { transform: scale(1.02); }
+        
+        .nav-links { display: flex; gap: 30px; align-items: center; }
+        .nav-links a { font-weight: 600; transition: color 0.3s ease; }
+        .nav-links a:hover { color: var(--cyan); }
+
+        .mobile-menu-btn {
+            display: none; background: none; border: none;
+            color: var(--text-main); cursor: pointer; padding: 5px;
+            transition: color 0.3s;
+        }
+        .mobile-menu-btn:hover { color: var(--cyan); }
+
+        /* --- HERO SECTION --- */
+        .hero { padding: 150px 0 100px; position: relative; }
+        .hero-blob {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 600px; height: 600px; background: rgba(6, 182, 212, 0.1);
+            border-radius: 50%; filter: blur(100px); z-index: -1;
+        }
+        .hero-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 50px; align-items: center; }
+        .terminal-badge {
+            display: inline-block; background: rgba(30, 41, 59, 0.8);
+            border: 1px solid var(--border-color); padding: 6px 16px; border-radius: 20px;
+            font-family: var(--font-mono); font-size: 0.9rem; color: var(--cyan); margin-bottom: 24px;
+        }
+        .hero h1 { font-size: 3.5rem; margin-bottom: 24px; }
+        .hero p { font-size: 1.2rem; color: var(--text-muted); margin-bottom: 32px; }
+        .hero-stats { margin-top: 20px; display: flex; align-items: center; gap: 10px; font-size: 0.9rem; color: var(--text-muted); }
+        .stars i { color: #eab308; width: 16px; height: 16px; fill: #eab308; }
+
+        /* FAKE TERMINAL */
+        .terminal-window {
+            background: #0f172a; border: 1px solid var(--border-color);
+            border-radius: 12px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+        .terminal-header {
+            background: #1e293b; padding: 12px 16px; display: flex; gap: 8px;
+            border-bottom: 1px solid var(--border-color); align-items: center;
+        }
+        .dot { width: 12px; height: 12px; border-radius: 50%; }
+        .dot.red { background: #ef4444; } .dot.yellow { background: #eab308; } .dot.green { background: #22c55e; }
+        .terminal-body {
+            padding: 24px; font-family: var(--font-mono); font-size: 0.9rem;
+            line-height: 1.8; color: var(--text-muted);
+        }
+        .cursor {
+            display: inline-block; width: 8px; height: 16px; background: var(--orange);
+            animation: blink 1s step-end infinite; vertical-align: middle;
+        }
+        @keyframes blink { 50% { opacity: 0; } }
+
+        /* --- SECTIONS COMMON --- */
+        section { padding: 100px 0; }
+        .section-header { text-align: center; margin-bottom: 60px; max-width: 800px; margin-inline: auto; }
+        .section-header h2 { font-size: 2.5rem; margin-bottom: 16px; }
+        .section-header p { font-size: 1.2rem; color: var(--text-muted); }
+
+        /* --- GRIDS --- */
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; }
+        .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 30px; }
+        .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+        .card {
+            background: rgba(30, 41, 59, 0.4); border: 1px solid var(--border-color);
+            padding: 30px; border-radius: 16px; transition: all 0.3s ease;
+        }
+        
+        /* PROBLEM SECTION */
+        .problem-card:hover { border-color: rgba(239, 68, 68, 0.4); transform: translateY(-5px); }
+        .problem-card i { color: #ef4444; margin-bottom: 20px; width: 40px; height: 40px; }
+        .problem-card h3 { margin-bottom: 12px; font-size: 1.3rem; }
+
+        /* WHY US SECTION */
+        .why-card { display: flex; align-items: flex-start; gap: 20px; }
+        .why-card i { color: var(--cyan); width: 32px; height: 32px; flex-shrink: 0; }
+        .why-card h3 { margin-bottom: 8px; font-size: 1.2rem; }
+        .why-card p { color: var(--text-muted); font-size: 0.95rem; }
+
+        /* --- COURSES --- */
+        .course-card {
+            display: flex; flex-direction: column; background: rgba(30, 41, 59, 0.6);
+            border: 1px solid var(--border-color); padding: 24px; border-radius: 16px; transition: all 0.3s ease;
+        }
+        .course-card:hover { border-color: var(--cyan); box-shadow: 0 0 20px var(--cyan-glow); }
+        .course-card i { width: 48px; height: 48px; margin-bottom: 16px; }
+        .tag {
+            background: var(--bg-dark); padding: 4px 8px; border-radius: 4px;
+            font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-muted);
+            margin-bottom: 16px; display: inline-block; width: max-content;
+        }
+        .course-card p { flex-grow: 1; font-size: 0.9rem; color: var(--text-muted); margin-bottom: 20px; }
+        .course-btn {
+            width: 100%; padding: 10px; background: var(--bg-card-hover); border: none;
+            color: white; border-radius: 6px; font-weight: 600; cursor: pointer; transition: 0.3s;
+        }
+        .course-btn:hover { background: #475569; }
+
+        /* --- PRICING & DROPDOWN --- */
+        .pricing-grid { display: grid; grid-template-columns: 1fr 1.1fr; gap: 40px; align-items: center; }
+        .pricing-card {
+            background: rgba(30, 41, 59, 0.5); border: 1px solid var(--border-color);
+            border-radius: 16px; padding: 40px;
+        }
+        .pricing-card.featured {
+            background: linear-gradient(180deg, rgba(30, 41, 59, 0.9) 0%, rgba(11, 17, 32, 0.9) 100%);
+            border-color: var(--orange); box-shadow: 0 0 30px var(--orange-glow); position: relative;
+        }
+        .badge {
+            position: absolute; top: -15px; left: 50%; transform: translateX(-50%);
+            background: var(--orange); color: white; padding: 6px 16px;
+            border-radius: 20px; font-weight: 700; font-size: 0.85rem;
+        }
+        
+        /* Custom Dropdown for Individual Pricing */
+        .course-select {
+            width: 100%; padding: 14px; margin: 15px 0;
+            background: var(--bg-dark); color: white;
+            border: 1px solid var(--cyan); border-radius: 8px;
+            font-family: var(--font-sans); font-size: 1.05rem; font-weight: 600;
+            outline: none; cursor: pointer; appearance: none;
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2306b6d4%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+            background-repeat: no-repeat; background-position: right 15px top 50%; background-size: 12px auto;
+        }
+        .course-select option { background: var(--bg-dark); color: white; padding: 10px; }
+
+        .price { font-size: 3rem; font-weight: 800; margin: 10px 0; }
+        .price span { font-size: 1rem; color: var(--text-muted); font-weight: 400; }
+        .pricing-list li { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; color: var(--text-muted); }
+        .pricing-list i { color: #22c55e; width: 20px; flex-shrink: 0; }
+
+        /* --- SYLLABUS & PAYMENT MODALS --- */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(11, 17, 32, 0.85); backdrop-filter: blur(8px);
+            z-index: 1000; display: flex; align-items: center; justify-content: center;
+            opacity: 0; visibility: hidden; transition: all 0.3s ease; padding: 20px;
+        }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        .modal-content {
+            background: #1e293b; border: 1px solid var(--cyan); border-radius: 16px;
+            width: 100%; max-width: 700px; max-height: 85vh; overflow-y: auto;
+            position: relative; transform: translateY(20px); transition: transform 0.3s ease;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+        
+        .modal-content::-webkit-scrollbar { width: 8px; }
+        .modal-content::-webkit-scrollbar-track { background: var(--bg-dark); border-radius: 0 16px 16px 0; }
+        .modal-content::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 10px; }
+        .modal-content::-webkit-scrollbar-thumb:hover { background: var(--cyan); }
+
+        .modal-overlay.active .modal-content { transform: translateY(0); }
+        .modal-header {
+            padding: 24px; border-bottom: 1px solid var(--border-color); display: flex;
+            justify-content: space-between; align-items: center; background: rgba(11, 17, 32, 0.95);
+            position: sticky; top: 0; z-index: 10;
+        }
+        .modal-close {
+            background: none; border: none; color: var(--text-muted);
+            cursor: pointer; padding: 5px; transition: color 0.3s;
+        }
+        .modal-close:hover { color: #ef4444; }
+        .modal-body { padding: 24px; }
+        .syllabus-topic {
+            margin-bottom: 24px; background: rgba(11, 17, 32, 0.4);
+            border-radius: 8px; padding: 20px; border-left: 3px solid var(--cyan);
+        }
+        .syllabus-topic h4 { margin-bottom: 12px; color: var(--cyan); font-size: 1.15rem; }
+        .syllabus-list { padding-left: 20px; }
+        .syllabus-list li {
+            position: relative; margin-bottom: 10px; color: var(--text-main); font-size: 0.95rem; line-height: 1.5;
+        }
+        .syllabus-list li::before {
+            content: "•"; color: var(--orange); font-weight: bold;
+            display: inline-block; width: 1.2em; margin-left: -1.2em;
+        }
+
+        /* --- FAQ SECTION --- */
+        .faq-container { max-width: 800px; margin: 0 auto; }
+        .faq-item {
+            border: 1px solid var(--border-color); background: rgba(30, 41, 59, 0.5);
+            border-radius: 8px; margin-bottom: 16px; overflow: hidden;
+        }
+        .faq-question {
+            width: 100%; text-align: left; padding: 20px; background: none; border: none;
+            color: white; font-size: 1.1rem; font-weight: 600; cursor: pointer;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .faq-answer {
+            padding: 0 20px; max-height: 0; overflow: hidden;
+            transition: max-height 0.3s ease, padding 0.3s ease; color: var(--text-muted);
+        }
+        .faq-item.active .faq-answer {
+            padding: 0 20px 20px; max-height: 300px; border-top: 1px solid var(--border-color);
+        }
+        .faq-item.active .icon-chevron { transform: rotate(180deg); color: var(--cyan); }
+        .icon-chevron { transition: 0.3s; }
+
+        /* --- MOBILE STICKY CTA --- */
+        .mobile-cta {
+            display: none; position: fixed; bottom: 0; left: 0; width: 100%;
+            background: var(--bg-dark); padding: 15px 20px;
+            border-top: 1px solid var(--border-color); z-index: 99;
+        }
+
+        /* --- RESPONSIVE DESIGN --- */
+        @media (max-width: 1024px) {
+            .hero-grid, .pricing-grid { grid-template-columns: 1fr; }
+            .grid-4 { grid-template-columns: repeat(2, 1fr); }
+            .hero h1 { font-size: 2.8rem; }
+            .hero { text-align: center; }
+            .hero-stats { justify-content: center; }
+        }
+        @media (max-width: 768px) {
+            .grid-3, .grid-4, .grid-2 { grid-template-columns: 1fr; }
+            .hero h1 { font-size: 2.2rem; }
+            .mobile-cta { display: block; }
+            .btn-container { flex-direction: column; display: flex; }
+            .modal-content { max-height: 80vh; }
             
-            <!-- Modal Header (Fixed at top) -->
-            <div class="modal-header" style="justify-content: center; position: relative; background: #1e293b; border-bottom: 1px solid var(--border-color); flex-shrink: 0;">
+            /* MOBILE NAVIGATION STYLES */
+            .mobile-menu-btn { display: block; }
+            .nav-btn { display: none; } 
+            
+            .nav-links {
+                position: absolute; top: 70px; left: 0; width: 100%;
+                background: rgba(11, 17, 32, 0.98); backdrop-filter: blur(10px);
+                flex-direction: column; gap: 0; padding: 0;
+                border-bottom: 1px solid var(--border-color);
+                box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+                transform: translateY(-150%); opacity: 0; visibility: hidden;
+                transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            }
+            .nav-links.active { transform: translateY(0); opacity: 1; visibility: visible; }
+            .nav-links a {
+                padding: 20px; width: 100%; text-align: center;
+                border-bottom: 1px solid rgba(255,255,255,0.05);
+            }
+            .nav-links a:last-child { border-bottom: none; }
+        }
+    </style>
+</head>
+<body id="top">
+
+    <!-- NAVBAR -->
+    <header>
+        <div class="nav-container">
+            <a href="#top" class="logo">
+                <i data-feather="terminal" class="text-cyan"></i>
+                Deep<span class="text-cyan">DevOps</span>
+            </a>
+            <button class="mobile-menu-btn" id="mobileMenuBtn"><i data-feather="menu"></i></button>
+            <nav class="nav-links" id="navLinks">
+                <a href="#courses" class="nav-link">Courses</a>
+                <a href="#solution" class="nav-link">Why Us</a>
+                <a href="#pricing" class="nav-link">Pricing</a>
+                <a href="#faq" class="nav-link">FAQ</a>
+                <a href="#pricing" class="btn btn-primary nav-btn desktop-only">Enroll Now</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- HERO SECTION -->
+    <main>
+        <section class="hero container">
+            <div class="hero-blob"></div>
+            <div class="hero-grid">
+                <div>
+                    <div class="terminal-badge">> sudo apt-get install devops-career</div>
+                    <h1>Stop Watching Tutorials. <br>
+                    <span class="text-cyan">Start Building Pipelines.</span></h1>
+                    <p>Master Linux, Docker, Kubernetes, and Terraform through <strong style="color: white;">100% hands-on labs</strong>. Ditch the theory. Gain the exact practical skills top tech companies are hiring for right now.</p>
+                    
+                    <div class="btn-container" style="display: flex; gap: 16px;">
+                        <a href="#pricing" class="btn btn-primary">
+                            <i data-feather="rocket"></i> Enroll in Bootcamp
+                        </a>
+                        <!-- WHATSAPP CTA -->
+                        <a href="https://wa.me/918871876379?text=Hi%20DeepDevOps,%20I%20want%20to%20become%20a%20DevOps%20engineer.%20Can%20you%20help%20me%20with%20the%20course%20details?" target="_blank" class="btn btn-secondary">
+                            <i data-feather="message-circle" style="color: #4ade80;"></i> Chat with Mentor
+                        </a>
+                    </div>
+                    
+                    <div class="hero-stats">
+                        <div class="stars">
+                            <i data-feather="star"></i><i data-feather="star"></i><i data-feather="star"></i><i data-feather="star"></i><i data-feather="star"></i>
+                        </div>
+                        <span>4.9/5 Rating | 5,000+ Engineers Trained</span>
+                    </div>
+                </div>
+
+                <!-- Fake Terminal Visual -->
+                <div class="terminal-window">
+                    <div class="terminal-header">
+                        <div class="dot red"></div>
+                        <div class="dot yellow"></div>
+                        <div class="dot green"></div>
+                        <span style="margin-left: 10px; color: var(--text-muted); font-family: var(--font-mono); font-size: 0.8rem;">ubuntu@deepdevops: ~</span>
+                    </div>
+                    <div class="terminal-body">
+                        <span class="text-cyan">$ terraform apply -auto-approve</span><br>
+                        aws_instance.prod_server: Creating...<br>
+                        aws_instance.prod_server: Creation complete after 32s[id=i-0abcd1234]<br><br>
+                        <span style="color: #4ade80;">$ kubectl get pods -n production</span><br>
+                        NAME &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; READY &nbsp; STATUS<br>
+                        payment-service-8f6b5d9 &nbsp;&nbsp; 1/1 &nbsp;&nbsp;&nbsp; Running<br>
+                        auth-service-5c4d3b8 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1/1 &nbsp;&nbsp;&nbsp; Running<br><br>
+                        <span class="cursor"></span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PROBLEM SECTION -->
+        <section class="container" style="border-top: 1px solid var(--border-color);">
+            <div class="section-header">
+                <h2>Are You Stuck in "Tutorial Hell"?</h2>
+                <p>The IT industry doesn't pay you for what you know. It pays you for what you can <span class="text-cyan" style="font-weight: 600;">build</span>.</p>
+            </div>
+            <div class="grid-3">
+                <div class="card problem-card">
+                    <i data-feather="alert-circle"></i>
+                    <h3>The Trap</h3>
+                    <p class="text-muted">Stuck in a low-paying Support/QA job with no clear path to a higher salary?</p>
+                </div>
+                <div class="card problem-card">
+                    <i data-feather="play-circle"></i>
+                    <h3>The Frustration</h3>
+                    <p class="text-muted">Learning DevOps from random YouTube videos but freezing up when asked to set up a real CI/CD pipeline?</p>
+                </div>
+                <div class="card problem-card">
+                    <i data-feather="shield"></i>
+                    <h3>The Rejection</h3>
+                    <p class="text-muted">Failing technical interviews because you lack "real-world production experience"?</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- WHY US SECTION -->
+        <section id="solution" class="container" style="border-top: 1px solid var(--border-color);">
+            <div class="section-header">
+                <h2>Why DeepDevOps Produces Top-Tier Engineers</h2>
+                <p>We don't do boring PowerPoint slides. We do live terminals. Experience a simulated work environment that turns beginners into professionals.</p>
+            </div>
+            <div class="grid-2">
+                <div class="card why-card">
+                    <i data-feather="terminal"></i>
+                    <div>
+                        <h3>100% Hands-On Labs</h3>
+                        <p>Browser-based terminal access. No local setup headaches. You learn by typing commands, fixing errors, and building systems from day one.</p>
+                    </div>
+                </div>
+                <div class="card why-card">
+                    <i data-feather="layout"></i>
+                    <div>
+                        <h3>Real-World Projects</h3>
+                        <p>Deploy a scalable, highly-available e-commerce microservices app on Kubernetes. Put real architecture on your resume, not just "Hello World".</p>
+                    </div>
+                </div>
+                <div class="card why-card">
+                    <i data-feather="users"></i>
+                    <div>
+                        <h3>Small Batch Mentoring</h3>
+                        <p>We strictly cap our batch sizes. Get your doubts solved live, screen-share your errors, and get unblocked instantly by Senior DevOps Mentors.</p>
+                    </div>
+                </div>
+                <div class="card why-card">
+                    <i data-feather="file-text"></i>
+                    <div>
+                        <h3>Resume & Interview Prep</h3>
+                        <p>We rewrite your resume to highlight your new projects and conduct brutal mock technical interviews so you don't freeze in front of HR.</p>
+                    </div>
+                </div>
+                <div class="card why-card">
+                    <i data-feather="unlock"></i>
+                    <div>
+                        <h3>Lifetime Access</h3>
+                        <p>Technology changes fast. Get lifetime access to your course dashboard, lecture recordings, and future syllabus updates for free.</p>
+                    </div>
+                </div>
+                <div class="card why-card">
+                    <i data-feather="message-square"></i>
+                    <div>
+                        <h3>24/7 Discord Community</h3>
+                        <p>Never learn alone. Network with peers, share job referrals, and get instant technical support from our alumni network and trainers.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- COURSES SECTION -->
+        <section id="courses" class="container" style="background: rgba(30, 41, 59, 0.2); border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); margin-top: 50px; padding-top: 80px;">
+            <div class="section-header">
+                <h2>The Ultimate DevOps Arsenal</h2>
+                <p>Master the core tools that run the modern internet.</p>
+            </div>
+            <div class="grid-4">
+                <div class="card course-card">
+                    <i data-feather="terminal" style="color: #eab308;"></i>
+                    <h3>Linux Mastery</h3>
+                    <span class="tag">Beginner • 3 Weeks</span>
+                    <p>Shell scripting, networking, user management, and core server administration.</p>
+                    <button class="course-btn" onclick="openModal('modal-linux')">View Syllabus</button>
+                </div>
+                <div class="card course-card">
+                    <i data-feather="box" style="color: #3b82f6;"></i>
+                    <h3>Docker Deep Dive</h3>
+                    <span class="tag">Intermediate • 2 Weeks</span>
+                    <p>Dockerfiles, multi-stage builds, Docker Compose, and networking.</p>
+                    <button class="course-btn" onclick="openModal('modal-docker')">View Syllabus</button>
+                </div>
+                <div class="card course-card">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 48px; height: 48px; margin-bottom: 16px; color: #06b6d4;"><path d="M12 2v20M17 5l-10 14M22 12H2M19 17L5 7"></path></svg>
+                    <h3>Kubernetes</h3>
+                    <span class="tag">Advanced • 4 Weeks</span>
+                    <p>Pods, Deployments, Services, Ingress, and cluster management.</p>
+                    <button class="course-btn" onclick="openModal('modal-k8s')">View Syllabus</button>
+                </div>
+                <div class="card course-card">
+                    <i data-feather="cloud" style="color: #a855f7;"></i>
+                    <h3>Terraform IaC</h3>
+                    <span class="tag">Intermediate • 3 Weeks</span>
+                    <p>Infrastructure as Code, state management, AWS provisioning, and modules.</p>
+                    <button class="course-btn" onclick="openModal('modal-terraform')">View Syllabus</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- PRICING SECTION UPDATED WITH DROPDOWN -->
+        <section id="pricing" class="container">
+            <div class="section-header">
+                <h2>Invest in Your Career. <br>Get Returns in Months.</h2>
+                <p style="color: var(--orange); font-weight: 600; margin-top: 10px;">🚨 Next Cohort Starts in <span id="countdown">3 Days</span>. Only 8 Seats Remaining!</p>
+            </div>
+            
+            <div class="pricing-grid">
+                
+                <!-- INDIVIDUAL MODULE (DYNAMIC) -->
+                <div class="pricing-card">
+                    <h3 style="font-size: 1.5rem; margin-bottom: 5px;">Individual Module</h3>
+                    <p class="text-muted">Select exactly what you want to learn.</p>
+                    
+                    <!-- Dynamic Dropdown -->
+                    <select id="course-select" class="course-select" onchange="updateIndividualPrice()">
+                        <option value="Linux Mastery" data-price="3,999">Linux Mastery Course</option>
+                        <option value="Docker Deep Dive" data-price="3,999">Docker Deep Dive Course</option>
+                        <option value="Kubernetes Hands-on" data-price="4,999">Kubernetes Hands-on Course</option>
+                        <option value="Terraform for DevOps" data-price="4,999">Terraform IaC Course</option>
+                    </select>
+
+                    <div class="price">₹<span id="individual-price-display" style="font-size: 3rem; color: white; font-weight: 800;">3,999</span></div>
+                    
+                    <ul class="pricing-list">
+                        <li><i data-feather="check-circle"></i> Lifetime access to recordings</li>
+                        <li><i data-feather="check-circle"></i> Hands-on lab access</li>
+                        <li><i data-feather="check-circle"></i> 1 Month doubt support</li>
+                        <li><i data-feather="check-circle"></i> Certificate of Completion</li>
+                    </ul>
+                    
+                    <button class="btn btn-secondary" style="width: 100%; margin-top: 20px;" onclick="handleIndividualEnroll()">Enroll in Module</button>
+                </div>
+
+                <!-- FULL BUNDLE -->
+                <div class="pricing-card featured">
+                    <div class="badge">🔥 BEST VALUE</div>
+                    <h3 style="color: white; font-size: 1.8rem;">Full-Stack DevOps Bundle</h3>
+                    <p class="text-muted">From zero to Job-Ready DevOps Engineer.</p>
+                    
+                    <div style="margin-top: 20px;">
+                        <span style="text-decoration: line-through; color: var(--text-muted); font-size: 1.2rem;">₹17,996</span>
+                        <div class="price" style="margin-top: 0; color: var(--orange);">₹11,999<span style="color: rgba(255,255,255,0.7);"> (Save 33%)</span></div>
+                    </div>
+
+                    <ul class="pricing-list" style="margin-top: 20px;">
+                        <li><i data-feather="check-circle"></i> <strong>All 4 Modules included</strong></li>
+                        <li><i data-feather="check-circle"></i> 3 Major Real-World Capstone Projects</li>
+                        <li><i data-feather="check-circle"></i> Resume Review & Interview Preparation</li>
+                        <li><i data-feather="check-circle"></i> Lifetime access to all future updates</li>
+                        <li><i data-feather="check-circle"></i> 24/7 VIP Discord Community Access</li>
+                    </ul>
+                    <button class="btn btn-primary" style="width: 100%; margin-top: 20px; font-size: 1.1rem; padding: 16px;" onclick="handleBundleEnroll()">Enroll in Bundle Now</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ SECTION -->
+        <section id="faq" class="container" style="border-top: 1px solid var(--border-color);">
+            <div class="section-header">
+                <h2>Got Questions? We've Got Answers.</h2>
+            </div>
+            <div class="faq-container">
+                <div class="faq-item">
+                    <button class="faq-question">
+                        Do I need coding/programming knowledge?
+                        <i data-feather="chevron-down" class="icon-chevron"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p>No deep coding is required. You only need to know basic scripting (which we cover in the Linux module). DevOps is more about configuration and architecture than writing complex software.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">
+                        Will I get a job after this?
+                        <i data-feather="chevron-down" class="icon-chevron"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p>We don't give fake "100% Job Guarantees." What we do guarantee is that you will have a rock-solid portfolio, an optimized resume, and the exact skills recruiters test for. Our students routinely get placed at top tech firms.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">
+                        Is this beginner-friendly?
+                        <i data-feather="chevron-down" class="icon-chevron"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Yes. If you can use a computer, you can start. We start from absolute zero with Linux and build up to complex Kubernetes clusters.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FOOTER CTA -->
+        <section style="background: linear-gradient(180deg, var(--bg-dark) 0%, rgba(6, 182, 212, 0.1) 100%); text-align: center; padding: 100px 20px; border-top: 1px solid var(--border-color);">
+            <div class="container" style="max-width: 800px;">
+                <h2 style="font-size: 3rem; margin-bottom: 20px;">Your High-Paying DevOps Career Starts Today.</h2>
+                <p class="text-muted" style="font-size: 1.2rem; margin-bottom: 40px;">The tech industry is desperate for engineers who can actually build and automate. Stop delaying your growth. Join the next cohort before seats fill up.</p>
+                <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
+                    <button class="btn btn-primary" style="padding: 16px 40px; font-size: 1.2rem;" onclick="handleBundleEnroll()">🚀 Claim Your Spot Now</button>
+                    
+                    <a href="https://wa.me/918871876379?text=Hi%20DeepDevOps,%20I%20want%20to%20enroll%20in%20the%20DevOps%20Bundle!" target="_blank" class="btn btn-secondary" style="padding: 16px 40px; font-size: 1.2rem;">
+                        <i data-feather="message-circle" style="color: #4ade80;"></i> WhatsApp Us
+                    </a>
+                </div>
+                <p style="margin-top: 30px; font-size: 0.9rem; color: var(--text-muted);">
+                    <i data-feather="lock" style="width: 14px; vertical-align: middle;"></i> 256-bit Secure Checkout | 💳 EMI Options Available
+                </p>
+            </div>
+        </section>
+    </main>
+
+    <!-- MOBILE STICKY CTA -->
+    <div class="mobile-cta">
+        <button class="btn btn-primary" style="width: 100%;" onclick="handleBundleEnroll()">Enroll in Bundle Now</button>
+    </div>
+
+    <!-- ================= MODALS SECTION ================= -->
+    
+    <!-- 1. SECURE PAYMENT MODAL (NEW) -->
+    <div id="modal-payment" class="modal-overlay" onclick="closeModalOnOutsideClick(event)">
+        <div class="modal-content" style="max-width: 450px; text-align: center; overflow: hidden;">
+            <div class="modal-header" style="justify-content: center; position: relative; background: #1e293b; border-bottom: 1px solid var(--border-color);">
                 <h3 style="font-size: 1.5rem; display: flex; align-items: center; gap: 8px;">
                     <i data-feather="lock" style="color: #22c55e;"></i> Secure Checkout
                 </h3>
                 <button class="modal-close" onclick="closeModal('modal-payment')" style="position: absolute; right: 20px; top: 24px;"><i data-feather="x"></i></button>
             </div>
-            
-            <!-- Modal Body (Scrollable if needed) -->
-            <div class="modal-body" style="padding: 20px 15px; background: var(--bg-dark); overflow-y: auto; flex-grow: 1;">
+            <div class="modal-body" style="padding: 30px 20px; background: var(--bg-dark);">
                 
-                <h4 style="color: var(--cyan); margin-bottom: 5px; font-size: 1.05rem;" id="pay-course-name">Course Name</h4>
-                <div style="font-size: 2.2rem; font-weight: 800; color: var(--orange); margin-bottom: 15px;">₹<span id="pay-amount">0</span></div>
+                <h4 style="color: var(--cyan); margin-bottom: 5px; font-size: 1.1rem;" id="pay-course-name">Course Name</h4>
+                <div style="font-size: 2.5rem; font-weight: 800; color: var(--orange); margin-bottom: 25px;">₹<span id="pay-amount">0</span></div>
                 
-                <!-- QR CODE IMAGE (Responsive sizing) -->
-                <div style="background: white; padding: 10px; border-radius: 12px; display: inline-block; margin-bottom: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
-                    <img src="qr-code.jpg" alt="PhonePe QR Code" style="width: 100%; max-width: 220px; max-height: 30vh; object-fit: contain; display: block; margin: 0 auto;">
+                <!-- QR CODE IMAGE (Ensure qr-code.jpg is in the same folder) -->
+                <div style="background: white; padding: 15px; border-radius: 12px; display: inline-block; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+                    <img src="qr-code.jpg" alt="PhonePe QR Code" style="width: 100%; max-width: 250px; display: block;">
                 </div>
                 
-                <p style="font-weight: 800; font-size: 1.1rem; margin-bottom: 2px; letter-spacing: 1px;">DEEPANSHU KUSHWAHA</p>
-                <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 20px;">Scan using PhonePe, GPay, or Paytm</p>
+                <p style="font-weight: 800; font-size: 1.2rem; margin-bottom: 5px; letter-spacing: 1px;">DEEPANSHU KUSHWAHA</p>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 25px;">Scan using PhonePe, GPay, or Paytm</p>
                 
-                <!-- Instructions -->
-                <div style="background: rgba(34, 197, 94, 0.1); border: 1px dashed rgba(34, 197, 94, 0.4); padding: 12px; border-radius: 8px; margin-bottom: 20px; text-align: left;">
-                    <p style="font-size: 0.9rem; color: #4ade80; margin: 0; display: flex; align-items: flex-start; gap: 10px;">
-                        <i data-feather="check-circle" style="width: 18px; flex-shrink: 0; margin-top: 2px;"></i>
-                        <span><strong>Step 2:</strong> After payment, click the button below and send us the payment screenshot to instantly unlock your access.</span>
+                <!-- Instructions & WhatsApp Button -->
+                <div style="background: rgba(34, 197, 94, 0.1); border: 1px dashed rgba(34, 197, 94, 0.4); padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: left;">
+                    <p style="font-size: 0.95rem; color: #4ade80; margin: 0; display: flex; align-items: flex-start; gap: 10px;">
+                        <i data-feather="check-circle" style="width: 20px; flex-shrink: 0; margin-top: 2px;"></i>
+                        <span><strong>Step 2:</strong> After payment, click the button below and send us the payment screenshot on WhatsApp to instantly unlock your access.</span>
                     </p>
                 </div>
                 
-                <!-- WhatsApp Button -->
-                <a id="whatsapp-confirm-btn" href="#" target="_blank" class="btn btn-primary" style="width: 100%; background-color: #25D366; box-shadow: 0 0 15px rgba(37, 211, 102, 0.4); padding: 14px 10px;">
+                <a id="whatsapp-confirm-btn" href="#" target="_blank" class="btn btn-primary" style="width: 100%; background-color: #25D366; box-shadow: 0 0 15px rgba(37, 211, 102, 0.4);">
                     <i data-feather="message-circle"></i> Send Screenshot on WhatsApp
                 </a>
             </div>
-            
         </div>
     </div>
+
+
+    <!-- 2. LINUX MODAL -->
+    <div id="modal-linux" class="modal-overlay" onclick="closeModalOnOutsideClick(event)">
+        <!-- Same as previous syllabus... omitted for brevity, keeping structure intact -->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 style="font-size: 1.5rem; display: flex; align-items: center; gap: 10px;"><i data-feather="terminal" style="color: #eab308;"></i> Linux Mastery</h3>
+                <button class="modal-close" onclick="closeModal('modal-linux')"><i data-feather="x"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="syllabus-topic">
+                    <h4>Module 1: Linux Basics</h4>
+                    <ul class="syllabus-list">
+                        <li>Introduction to Linux distributions (Ubuntu, CentOS)</li>
+                        <li>Understanding the Linux filesystem hierarchy</li>
+                        <li>Essential commands & File permissions</li>
+                    </ul>
+                </div>
+                <!-- ... other modules ... -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. DOCKER MODAL -->
+    <div id="modal-docker" class="modal-overlay" onclick="closeModalOnOutsideClick(event)">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 style="font-size: 1.5rem; display: flex; align-items: center; gap: 10px;"><i data-feather="box" style="color: #3b82f6;"></i> Docker Deep Dive</h3>
+                <button class="modal-close" onclick="closeModal('modal-docker')"><i data-feather="x"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="syllabus-topic">
+                    <h4>Module 1: Docker Fundamentals</h4>
+                    <ul class="syllabus-list">
+                        <li>Docker architecture: client, daemon, images</li>
+                        <li>Running your first container</li>
+                        <li>Basic commands: docker ps, stop, rm, images</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. K8S MODAL -->
+    <div id="modal-k8s" class="modal-overlay" onclick="closeModalOnOutsideClick(event)">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 style="font-size: 1.5rem; display: flex; align-items: center; gap: 10px;">Kubernetes Syllabus</h3>
+                <button class="modal-close" onclick="closeModal('modal-k8s')"><i data-feather="x"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="syllabus-topic">
+                    <h4>Module 1: Kubernetes Fundamentals</h4>
+                    <ul class="syllabus-list">
+                        <li>K8s architecture: control plane and worker nodes</li>
+                        <li>Setting up a local cluster</li>
+                        <li>Core objects: Pods, ReplicaSets, Deployments</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. TERRAFORM MODAL -->
+    <div id="modal-terraform" class="modal-overlay" onclick="closeModalOnOutsideClick(event)">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 style="font-size: 1.5rem; display: flex; align-items: center; gap: 10px;"><i data-feather="cloud" style="color: #a855f7;"></i> Terraform Syllabus</h3>
+                <button class="modal-close" onclick="closeModal('modal-terraform')"><i data-feather="x"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="syllabus-topic">
+                    <h4>Module 1: Terraform Fundamentals</h4>
+                    <ul class="syllabus-list">
+                        <li>Introduction to Infrastructure as Code (IaC)</li>
+                        <li>Terraform architecture: providers, resources, state</li>
+                        <li>Basic workflow: init, plan, apply, destroy</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ================= JAVASCRIPT ================= -->
+    <script>
+        // 1. Initialize Feather Icons
+        feather.replace();
+
+        // 2. Mobile Menu Logic
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const navLinks = document.getElementById('navLinks');
+        const navItems = document.querySelectorAll('.nav-link');
+
+        mobileMenuBtn.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+            const icon = navLinks.classList.contains('active') ? 'x' : 'menu';
+            mobileMenuBtn.innerHTML = `<i data-feather="${icon}"></i>`;
+            feather.replace();
+        });
+
+        navItems.forEach(item => {
+            item.addEventListener('click', () => {
+                navLinks.classList.remove('active');
+                mobileMenuBtn.innerHTML = `<i data-feather="menu"></i>`;
+                feather.replace();
+            });
+        });
+
+        // 3. Dynamic Dropdown Pricing Logic
+        function updateIndividualPrice() {
+            const select = document.getElementById('course-select');
+            const price = select.options[select.selectedIndex].getAttribute('data-price');
+            document.getElementById('individual-price-display').innerText = price;
+        }
+
+        // 4. Payment Modal Handlers
+        function handleIndividualEnroll() {
+            const select = document.getElementById('course-select');
+            const courseName = select.options[select.selectedIndex].text;
+            const price = select.options[select.selectedIndex].getAttribute('data-price');
+            openPaymentModal(courseName, price);
+        }
+
+        function handleBundleEnroll() {
+            openPaymentModal('Full-Stack DevOps Bundle', '11,999');
+        }
+
+        function openPaymentModal(courseName, price) {
+            // Update Modal UI with exact course data
+            document.getElementById('pay-course-name').innerText = `Payment for: ${courseName}`;
+            document.getElementById('pay-amount').innerText = price;
+            
+            // Generate WhatsApp Link dynamically
+            const waBtn = document.getElementById('whatsapp-confirm-btn');
+            const message = encodeURIComponent(`Hi DeepDevOps! I have just made the payment of ₹${price} for the "${courseName}". Here is my payment screenshot:`);
+            waBtn.href = `https://wa.me/918871876379?text=${message}`;
+            
+            openModal('modal-payment');
+        }
+
+        // 5. General Modal Logic
+        function openModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            feather.replace(); // Ensure icons load in modal
+        }
+
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        function closeModalOnOutsideClick(event) {
+            if (event.target.classList.contains('modal-overlay')) {
+                event.target.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        // 6. FAQ Accordion Logic
+        const faqItems = document.querySelectorAll('.faq-item');
+        faqItems.forEach(item => {
+            const btn = item.querySelector('.faq-question');
+            btn.addEventListener('click', () => {
+                faqItems.forEach(otherItem => {
+                    if (otherItem !== item && otherItem.classList.contains('active')) {
+                        otherItem.classList.remove('active');
+                    }
+                });
+                item.classList.toggle('active');
+            });
+        });
+
+        // 7. Simple Countdown Timer
+        function updateCountdown() {
+            const countdownEl = document.getElementById('countdown');
+            let hours = 71; let minutes = 59; let seconds = 59;
+            setInterval(() => {
+                seconds--;
+                if(seconds < 0) { seconds = 59; minutes--; }
+                if(minutes < 0) { minutes = 59; hours--; }
+                const h = hours.toString().padStart(2, '0');
+                const m = minutes.toString().padStart(2, '0');
+                const s = seconds.toString().padStart(2, '0');
+                countdownEl.innerText = `${h}h : ${m}m : ${s}s`;
+            }, 1000);
+        }
+        updateCountdown();
+    </script>
+</body>
+</html>
