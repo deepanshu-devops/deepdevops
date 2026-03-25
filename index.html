@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeepDevOps | Master Real-World DevOps</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Feather Icons -->
+    <script src="https://unpkg.com/feather-icons"></script>
+
+    <style>
+        /* --- CSS VARIABLES & RESET --- */
+        :root {
+            --bg-dark: #0B1120;
+            --bg-card: #1e293b;
+            --bg-card-hover: #334155;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --cyan: #06b6d4;
+            --cyan-glow: rgba(6, 182, 212, 0.4);
+            --orange: #f97316;
+            --orange-glow: rgba(249, 115, 22, 0.4);
+            --border-color: #334155;
+            --font-sans: 'Plus Jakarta Sans', sans-serif;
+            --font-mono: 'Fira Code', monospace;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; }
+        
+        .container {
+            max-w-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* --- TYPOGRAPHY --- */
+        h1, h2, h3, h4 { line-height: 1.2; font-weight: 800; }
+        .text-cyan { color: var(--cyan); }
+        .text-orange { color: var(--orange); }
+        .text-muted { color: var(--text-muted); }
+        
+        /* --- BUTTONS --- */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 14px 28px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+        }
+        .btn-primary {
+            background-color: var(--orange);
+            color: white;
+            box-shadow: 0 0 15px var(--orange-glow);
+        }
+        .btn-primary:hover {
+            background-color: #ea580c;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px var(--orange-glow);
+        }
+        .btn-secondary {
+            background-color: rgba(30, 41, 59, 0.8);
+            color: white;
+            border: 1px solid var(--border-color);
+        }
+        .btn-secondary:hover {
+            background-color: var(--bg-card-hover);
+        }
+
+        /* --- NAVBAR --- */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(11, 17, 32, 0.85);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 100;
+        }
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 70px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.5rem;
+            font-weight: 800;
+        }
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+        .nav-links a {
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+        .nav-links a:hover { color: var(--cyan); }
+
+        /* --- HERO SECTION --- */
+        .hero {
+            padding: 150px 0 100px;
+            position: relative;
+        }
+        .hero-blob {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px;
+            height: 600px;
+            background: rgba(6, 182, 212, 0.1);
+            border-radius: 50%;
+            filter: blur(100px);
+            z-index: -1;
+        }
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            align-items: center;
+        }
+        .terminal-badge {
+            display: inline-block;
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid var(--border-color);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            color: var(--cyan);
+            margin-bottom: 24px;
+        }
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 24px;
+        }
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            margin-bottom: 32px;
+        }
+        .hero-stats {
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+        .stars i { color: #eab308; width: 16px; height: 16px; fill: #eab308; }
+
+        /* FAKE TERMINAL */
+        .terminal-window {
+            background: #0f172a;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+        .terminal-header {
+            background: #1e293b;
+            padding: 12px 16px;
+            display: flex;
+            gap: 8px;
+            border-bottom: 1px solid var(--border-color);
+            align-items: center;
+        }
+        .dot { width: 12px; height: 12px; border-radius: 50%; }
+        .dot.red { background: #ef4444; }
+        .dot.yellow { background: #eab308; }
+        .dot.green { background: #22c55e; }
+        .terminal-body {
+            padding: 24px;
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            line-height: 1.8;
+            color: var(--text-muted);
+        }
+        .cursor {
+            display: inline-block;
+            width: 8px;
+            height: 16px;
+            background: var(--orange);
+            animation: blink 1s step-end infinite;
+            vertical-align: middle;
+        }
+        @keyframes blink { 50% { opacity: 0; } }
+
+        /* --- SECTIONS COMMON --- */
+        section { padding: 100px 0; }
+        .section-header { text-align: center; margin-bottom: 60px; }
+        .section-header h2 { font-size: 2.5rem; margin-bottom: 16px; }
+        .section-header p { font-size: 1.2rem; color: var(--text-muted); }
+
+        /* --- PROBLEM CARDS --- */
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+        }
+        .card {
+            background: rgba(30, 41, 59, 0.4);
+            border: 1px solid var(--border-color);
+            padding: 30px;
+            border-radius: 16px;
+            transition: all 0.3s ease;
+        }
+        .card:hover {
+            border-color: rgba(239, 68, 68, 0.4);
+            transform: translateY(-5px);
+        }
+        .card i { color: #ef4444; margin-bottom: 20px; width: 40px; height: 40px; }
+        .card h3 { margin-bottom: 12px; font-size: 1.3rem; }
+
+        /* --- COURSES --- */
+        .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+        }
+        .course-card {
+            display: flex;
+            flex-direction: column;
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid var(--border-color);
+            padding: 24px;
+            border-radius: 16px;
+            transition: all 0.3s ease;
+        }
+        .course-card:hover { border-color: var(--cyan); box-shadow: 0 0 20px var(--cyan-glow); }
+        .course-card i { width: 48px; height: 48px; margin-bottom: 16px; }
+        .tag {
+            background: var(--bg-dark);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+            display: inline-block;
+            width: max-content;
+        }
+        .course-card p { flex-grow: 1; font-size: 0.9rem; color: var(--text-muted); margin-bottom: 20px; }
+        .course-btn {
+            width: 100%;
+            padding: 10px;
+            background: var(--bg-card-hover);
+            border: none;
+            color: white;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .course-btn:hover { background: #475569; }
+
+        /* --- PRICING --- */
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.1fr;
+            gap: 40px;
+            align-items: center;
+        }
+        .pricing-card {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 40px;
+        }
+        .pricing-card.featured {
+            background: linear-gradient(180deg, rgba(30, 41, 59, 0.9) 0%, rgba(11, 17, 32, 0.9) 100%);
+            border-color: var(--orange);
+            box-shadow: 0 0 30px var(--orange-glow);
+            position: relative;
+        }
+        .badge {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--orange);
+            color: white;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+        .price { font-size: 3rem; font-weight: 800; margin: 20px 0; }
+        .price span { font-size: 1rem; color: var(--text-muted); font-weight: 400; }
+        .pricing-list li {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            color: var(--text-muted);
+        }
+        .pricing-list i { color: #22c55e; width: 20px; }
+        
+        /* --- FAQ SECTION --- */
+        .faq-container { max-width: 800px; margin: 0 auto; }
+        .faq-item {
+            border: 1px solid var(--border-color);
+            background: rgba(30, 41, 59, 0.5);
+            border-radius: 8px;
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+        .faq-question {
+            width: 100%;
+            text-align: left;
+            padding: 20px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .faq-answer {
+            padding: 0 20px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, padding 0.3s ease;
+            color: var(--text-muted);
+        }
+        .faq-item.active .faq-answer {
+            padding: 0 20px 20px;
+            max-height: 200px;
+            border-top: 1px solid var(--border-color);
+        }
+        .faq-item.active .icon-chevron { transform: rotate(180deg); color: var(--cyan); }
+        .icon-chevron { transition: 0.3s; }
+
+        /* --- MOBILE STICKY CTA --- */
+        .mobile-cta {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: var(--bg-dark);
+            padding: 15px 20px;
+            border-top: 1px solid var(--border-color);
+            z-index: 99;
+        }
+
+        /* --- RESPONSIVE DESIGN --- */
+        @media (max-width: 1024px) {
+            .hero-grid, .pricing-grid { grid-template-columns: 1fr; }
+            .grid-4 { grid-template-columns: repeat(2, 1fr); }
+            .hero h1 { font-size: 2.8rem; }
+            .hero { text-align: center; }
+            .hero-stats { justify-content: center; }
+        }
+        @media (max-width: 768px) {
+            .grid-3, .grid-4 { grid-template-columns: 1fr; }
+            .nav-links, .nav-btn { display: none; } /* Hide nav on mobile for simplicity */
+            .hero h1 { font-size: 2.2rem; }
+            .mobile-cta { display: block; }
+            .btn-container { flex-direction: column; display: flex; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <header>
+        <div class="nav-container">
+            <div class="logo">
+                <i data-feather="terminal" class="text-cyan"></i>
+                Deep<span class="text-cyan">DevOps</span>
+            </div>
+            <nav class="nav-links">
+                <a href="#courses">Courses</a>
+                <a href="#solution">Why Us</a>
+                <a href="#pricing">Pricing</a>
+                <a href="#faq">FAQ</a>
+            </nav>
+            <a href="#pricing" class="btn btn-primary nav-btn">Enroll Now</a>
+        </div>
+    </header>
+
+    <!-- HERO SECTION -->
+    <main>
+        <section class="hero container">
+            <div class="hero-blob"></div>
+            <div class="hero-grid">
+                <div>
+                    <div class="terminal-badge">> sudo apt-get install devops-career</div>
+                    <h1>Stop Watching Tutorials. <br>
+                    <span class="text-cyan">Start Building Pipelines.</span></h1>
+                    <p>Master Linux, Docker, Kubernetes, and Terraform through <strong style="color: white;">100% hands-on labs</strong>. Ditch the theory. Gain the exact practical skills top tech companies are hiring for right now.</p>
+                    
+                    <div class="btn-container" style="display: flex; gap: 16px;">
+                        <a href="#pricing" class="btn btn-primary">
+                            <i data-feather="rocket"></i> Enroll in Bootcamp
+                        </a>
+                        <a href="https://wa.me/yourwhatsappnumber" class="btn btn-secondary">
+                            <i data-feather="message-circle" style="color: #4ade80;"></i> Chat with Mentor
+                        </a>
+                    </div>
+                    
+                    <div class="hero-stats">
+                        <div class="stars">
+                            <i data-feather="star"></i><i data-feather="star"></i><i data-feather="star"></i><i data-feather="star"></i><i data-feather="star"></i>
+                        </div>
+                        <span>4.9/5 Rating | 5,000+ Engineers Trained</span>
+                    </div>
+                </div>
+
+                <!-- Fake Terminal Visual -->
+                <div class="terminal-window">
+                    <div class="terminal-header">
+                        <div class="dot red"></div>
+                        <div class="dot yellow"></div>
+                        <div class="dot green"></div>
+                        <span style="margin-left: 10px; color: var(--text-muted); font-family: var(--font-mono); font-size: 0.8rem;">ubuntu@deepdevops: ~</span>
+                    </div>
+                    <div class="terminal-body">
+                        <span class="text-cyan">$ terraform apply -auto-approve</span><br>
+                        aws_instance.prod_server: Creating...<br>
+                        aws_instance.prod_server: Creation complete after 32s[id=i-0abcd1234]<br><br>
+                        <span style="color: #4ade80;">$ kubectl get pods -n production</span><br>
+                        NAME &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; READY &nbsp; STATUS<br>
+                        payment-service-8f6b5d9 &nbsp;&nbsp; 1/1 &nbsp;&nbsp;&nbsp; Running<br>
+                        auth-service-5c4d3b8 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1/1 &nbsp;&nbsp;&nbsp; Running<br><br>
+                        <span class="cursor"></span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PROBLEM SECTION -->
+        <section class="container" style="border-top: 1px solid var(--border-color);">
+            <div class="section-header">
+                <h2>Are You Stuck in "Tutorial Hell"?</h2>
+                <p>The IT industry doesn't pay you for what you know. It pays you for what you can <span class="text-cyan" style="font-weight: 600;">build</span>.</p>
+            </div>
+            <div class="grid-3">
+                <div class="card">
+                    <i data-feather="alert-circle"></i>
+                    <h3>The Trap</h3>
+                    <p class="text-muted">Stuck in a low-paying Support/QA job with no clear path to a higher salary?</p>
+                </div>
+                <div class="card">
+                    <i data-feather="play-circle"></i>
+                    <h3>The Frustration</h3>
+                    <p class="text-muted">Learning DevOps from random YouTube videos but freezing up when asked to set up a real CI/CD pipeline?</p>
+                </div>
+                <div class="card">
+                    <i data-feather="shield"></i>
+                    <h3>The Rejection</h3>
+                    <p class="text-muted">Failing technical interviews because you lack "real-world production experience"?</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- COURSES SECTION -->
+        <section id="courses" class="container" style="background: rgba(30, 41, 59, 0.2); border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); margin-top: 50px; padding-top: 80px;">
+            <div class="section-header">
+                <h2>The Ultimate DevOps Arsenal</h2>
+                <p>Master the tools that run the modern internet.</p>
+            </div>
+            <div class="grid-4">
+                <div class="card course-card">
+                    <i data-feather="terminal" style="color: #eab308;"></i>
+                    <h3>Linux Mastery</h3>
+                    <span class="tag">Beginner • 3 Weeks</span>
+                    <p>Shell scripting, user management, networking, server troubleshooting, and CRON jobs.</p>
+                    <button class="course-btn">View Syllabus</button>
+                </div>
+                <div class="card course-card">
+                    <i data-feather="box" style="color: #3b82f6;"></i>
+                    <h3>Docker Deep Dive</h3>
+                    <span class="tag">Intermediate • 2 Weeks</span>
+                    <p>Dockerfiles, multi-stage builds, Docker Compose, volumes, and networking.</p>
+                    <button class="course-btn">View Syllabus</button>
+                </div>
+                <div class="card course-card">
+                    <!-- Custom SVG for Kubernetes since Feather doesn't have it -->
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 48px; height: 48px; margin-bottom: 16px; color: #06b6d4;"><path d="M12 2v20M17 5l-10 14M22 12H2M19 17L5 7"></path></svg>
+                    <h3>Kubernetes</h3>
+                    <span class="tag">Advanced • 4 Weeks</span>
+                    <p>Pods, Deployments, Services, Ingress, Helm charts, and cluster management.</p>
+                    <button class="course-btn">View Syllabus</button>
+                </div>
+                <div class="card course-card">
+                    <i data-feather="cloud" style="color: #a855f7;"></i>
+                    <h3>Terraform IaC</h3>
+                    <span class="tag">Intermediate • 3 Weeks</span>
+                    <p>Infrastructure as Code, state management, AWS provisioning, and modules.</p>
+                    <button class="course-btn">View Syllabus</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- PRICING SECTION -->
+        <section id="pricing" class="container">
+            <div class="section-header">
+                <h2>Invest in Your Career. <br>Get Returns in Months.</h2>
+                <p style="color: var(--orange); font-weight: 600; margin-top: 10px;">🚨 Next Cohort Starts in <span id="countdown">3 Days</span>. Only 8 Seats Remaining!</p>
+            </div>
+            
+            <div class="pricing-grid">
+                <!-- Single Module -->
+                <div class="pricing-card">
+                    <h3>Individual Module</h3>
+                    <p class="text-muted">Pick exactly what you want to learn.</p>
+                    <div class="price">₹4,999<span>/module</span></div>
+                    <ul class="pricing-list">
+                        <li><i data-feather="check-circle"></i> Choose Linux, Docker, K8s or Terraform</li>
+                        <li><i data-feather="check-circle"></i> Lifetime access to recordings</li>
+                        <li><i data-feather="check-circle"></i> Hands-on lab access</li>
+                        <li><i data-feather="check-circle"></i> 1 Month doubt support</li>
+                    </ul>
+                    <a href="#" class="btn btn-secondary" style="width: 100%; margin-top: 20px;">Select Module</a>
+                </div>
+
+                <!-- Full Bundle -->
+                <div class="pricing-card featured">
+                    <div class="badge">🔥 BEST VALUE</div>
+                    <h3 style="color: white; font-size: 1.8rem;">Full-Stack DevOps Bundle</h3>
+                    <p class="text-muted">From zero to Job-Ready DevOps Engineer.</p>
+                    
+                    <div style="margin-top: 20px;">
+                        <span style="text-decoration: line-through; color: var(--text-muted); font-size: 1.2rem;">₹19,996</span>
+                        <div class="price" style="margin-top: 0; color: var(--orange);">₹11,999<span> (Save 40%)</span></div>
+                    </div>
+
+                    <ul class="pricing-list" style="margin-top: 20px;">
+                        <li><i data-feather="check-circle"></i> <strong>All 4 Modules included</strong></li>
+                        <li><i data-feather="check-circle"></i> 3 Major Real-World Capstone Projects</li>
+                        <li><i data-feather="check-circle"></i> Resume Review & Interview Preparation</li>
+                        <li><i data-feather="check-circle"></i> Lifetime access to all future updates</li>
+                        <li><i data-feather="check-circle"></i> 24/7 VIP Discord Community Access</li>
+                    </ul>
+                    <a href="#" class="btn btn-primary" style="width: 100%; margin-top: 20px; font-size: 1.1rem; padding: 16px;">Enroll in Bundle Now</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ SECTION -->
+        <section id="faq" class="container" style="border-top: 1px solid var(--border-color);">
+            <div class="section-header">
+                <h2>Got Questions? We've Got Answers.</h2>
+            </div>
+            <div class="faq-container">
+                <div class="faq-item">
+                    <button class="faq-question">
+                        Do I need coding/programming knowledge?
+                        <i data-feather="chevron-down" class="icon-chevron"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p>No deep coding is required. You only need to know basic scripting (which we cover in the Linux module). DevOps is more about configuration and architecture than writing complex software.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">
+                        Will I get a job after this?
+                        <i data-feather="chevron-down" class="icon-chevron"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p>We don't give fake "100% Job Guarantees." What we do guarantee is that you will have a rock-solid portfolio, an optimized resume, and the exact skills recruiters test for. Our students routinely get placed at top tech firms.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">
+                        Is this beginner-friendly?
+                        <i data-feather="chevron-down" class="icon-chevron"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Yes. If you can use a computer, you can start. We start from absolute zero with Linux and build up to complex Kubernetes clusters.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">
+                        What if I miss a live session?
+                        <i data-feather="chevron-down" class="icon-chevron"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Every session is recorded and uploaded to your dashboard within 2 hours. Plus, you have lifetime access to the recordings.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FOOTER CTA -->
+        <section style="background: linear-gradient(180deg, var(--bg-dark) 0%, rgba(6, 182, 212, 0.1) 100%); text-align: center; padding: 100px 20px; border-top: 1px solid var(--border-color);">
+            <div class="container" style="max-width: 800px;">
+                <h2 style="font-size: 3rem; margin-bottom: 20px;">Your High-Paying DevOps Career Starts Today.</h2>
+                <p class="text-muted" style="font-size: 1.2rem; margin-bottom: 40px;">The tech industry is desperate for engineers who can actually build and automate. Stop delaying your growth. Join the next cohort before seats fill up.</p>
+                <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
+                    <a href="#pricing" class="btn btn-primary" style="padding: 16px 40px; font-size: 1.2rem;">🚀 Claim Your Spot Now</a>
+                </div>
+                <p style="margin-top: 30px; font-size: 0.9rem; color: var(--text-muted);">
+                    <i data-feather="lock" style="width: 14px; vertical-align: middle;"></i> 256-bit Secure Checkout | 💳 EMI Options Available
+                </p>
+            </div>
+        </section>
+    </main>
+
+    <!-- MOBILE STICKY CTA -->
+    <div class="mobile-cta">
+        <a href="#pricing" class="btn btn-primary" style="width: 100%;">Enroll in Bundle Now</a>
+    </div>
+
+    <!-- JAVASCRIPT -->
+    <script>
+        // 1. Initialize Feather Icons
+        feather.replace();
+
+        // 2. FAQ Accordion Logic
+        const faqItems = document.querySelectorAll('.faq-item');
+        
+        faqItems.forEach(item => {
+            const btn = item.querySelector('.faq-question');
+            btn.addEventListener('click', () => {
+                // Close other open FAQs
+                faqItems.forEach(otherItem => {
+                    if (otherItem !== item && otherItem.classList.contains('active')) {
+                        otherItem.classList.remove('active');
+                    }
+                });
+                
+                // Toggle current FAQ
+                item.classList.toggle('active');
+            });
+        });
+
+        // 3. Simple Countdown Timer (Visual effect for urgency)
+        function updateCountdown() {
+            const countdownEl = document.getElementById('countdown');
+            // Assuming the cohort starts in exactly 3 days from the moment user opens the page
+            let hours = 71;
+            let minutes = 59;
+            let seconds = 59;
+
+            setInterval(() => {
+                seconds--;
+                if(seconds < 0) { seconds = 59; minutes--; }
+                if(minutes < 0) { minutes = 59; hours--; }
+                
+                // Format numbers to have leading zeros
+                const h = hours.toString().padStart(2, '0');
+                const m = minutes.toString().padStart(2, '0');
+                const s = seconds.toString().padStart(2, '0');
+                
+                countdownEl.innerText = `${h}h : ${m}m : ${s}s`;
+            }, 1000);
+        }
+        
+        // Start countdown
+        updateCountdown();
+    </script>
+</body>
+</html>
